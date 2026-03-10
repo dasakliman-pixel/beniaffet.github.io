@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>bini iffedermisin</title>
+  <style>
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-family: Arial, sans-serif;
+      background: linear-gradient(135deg, #ffd1dc, #ffe9f0, #fff6f9);
+      overflow: hidden;
+    }
+
+    .card {
+      width: min(92vw, 700px);
+      background: rgba(255,255,255,0.95);
+      border-radius: 28px;
+      padding: 36px 28px 90px;
+      text-align: center;
+      box-shadow: 0 20px 60px rgba(0,0,0,0.12);
+      position: relative;
+    }
+
+    h1 {
+      margin: 0 0 14px;
+      font-size: clamp(28px, 5vw, 44px);
+      color: #d6336c;
+    }
+
+    p {
+      margin: 0 auto 26px;
+      max-width: 520px;
+      font-size: 18px;
+      line-height: 1.6;
+      color: #444;
+    }
+
+    .hearts {
+      font-size: 32px;
+      margin-bottom: 18px;
+      animation: float 2.6s ease-in-out infinite;
+    }
+
+    @keyframes float {
+      0%,100% { transform: translateY(0); }
+      50% { transform: translateY(-8px); }
+    }
+
+    .buttons {
+      position: relative;
+      height: 130px;
+      margin-top: 10px;
+    }
+
+    button {
+      border: none;
+      padding: 14px 28px;
+      font-size: 18px;
+      font-weight: bold;
+      border-radius: 999px;
+      cursor: pointer;
+      transition: transform .15s ease, box-shadow .15s ease, left .2s ease, top .2s ease;
+      box-shadow: 0 10px 24px rgba(0,0,0,0.12);
+      user-select: none;
+    }
+
+    button:hover { transform: scale(1.05); }
+
+    #yesBtn {
+      background: #ff4d88;
+      color: white;
+      position: absolute;
+      left: calc(50% - 150px);
+      top: 25px;
+    }
+
+    #noBtn {
+      background: #f1f3f5;
+      color: #444;
+      position: absolute;
+      left: calc(50% + 30px);
+      top: 25px;
+    }
+
+    .result {
+      margin-top: 18px;
+      font-size: 22px;
+      font-weight: bold;
+      color: #c2255c;
+      min-height: 32px;
+    }
+
+    .tiny {
+      margin-top: 12px;
+      font-size: 13px;
+      color: #777;
+    }
+
+    .fullscreen {
+      position: fixed;
+      inset: 0;
+      background: linear-gradient(135deg, #ff8fab, #ffccd5, #fff0f3);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      padding: 24px;
+      z-index: 5;
+    }
+
+    .fullscreen.show { display: flex; }
+
+    .fullscreen-box {
+      background: rgba(255,255,255,0.96);
+      border-radius: 30px;
+      padding: 36px 24px;
+      max-width: 700px;
+      box-shadow: 0 20px 60px rgba(0,0,0,0.12);
+    }
+
+    .fullscreen-box h2 {
+      font-size: clamp(34px, 6vw, 64px);
+      color: #d6336c;
+      margin: 0 0 16px;
+    }
+
+    .fullscreen-box p {
+      font-size: clamp(18px, 3vw, 28px);
+      color: #444;
+      margin-bottom: 0;
+    }
+  </style>
+</head>
+<body>
+  <div class="card" id="card">
+    <div style="margin-bottom:18px;"><div id="photoFallback" style="display:none;font-size:14px;color:#888;">foto bulunamadi (tuniiiis.png ayni klasorde olmali)</div><img src="tuniiiis.png" onerror="this.style.display='none';document.getElementById('photoFallback').style.display='block';" style="width:120px;height:120px;border-radius:20px;object-fit:cover;box-shadow:0 10px 30px rgba(0,0,0,0.2);"></div>
+    <h1>bini iffedermisin</h1>
+    <p>
+      ruzgosbabis ozur dilemektedr tunis hannim iffidecekmisiniss?😿
+    </p>
+
+    <div class="buttons" id="buttonArea">
+      <button id="yesBtn">iviiiit 😽</button>
+      <button id="noBtn">nopppppe 😿</button>
+    </div>
+
+    <div class="result" id="result"></div>
+    <div class="tiny">bu sayfa sana ozel hazirlandi duba hanim ✨</div>
+  </div>
+
+  <div class="fullscreen" id="successScreen">
+    <div class="fullscreen-box">
+      <h2>yeeyyyyy😸</h2>
+      <p>ivit biliodm beni iffidecegini seni cok sebiom 🌸</p>
+    </div>
+  </div>
+
+  <script>
+    const noBtn = document.getElementById('noBtn');
+    const yesBtn = document.getElementById('yesBtn');
+    const result = document.getElementById('result');
+    const area = document.getElementById('buttonArea');
+    const successScreen = document.getElementById('successScreen');
+
+    let noClickCount = 0;
+    let noStartedEscaping = false;
+
+    function randomPosition() {
+      const areaRect = area.getBoundingClientRect();
+      const btnRect = noBtn.getBoundingClientRect();
+      const maxLeft = Math.max(10, areaRect.width - btnRect.width - 10);
+      const maxTop = Math.max(10, areaRect.height - btnRect.height - 10);
+      const left = Math.floor(Math.random() * maxLeft);
+      const top = Math.floor(Math.random() * maxTop);
+      noBtn.style.left = left + 'px';
+      noBtn.style.top = top + 'px';
+    }
+
+    const noMessages = [
+        'eminmisin 😿',
+        'bence bida dusun 😿',
+        'gercekten mi ua 😿',
+        'son kez soruyom 😿',
+        'bence ivite basmak istedin 😸'
+      ];
+
+      noBtn.addEventListener('click', () => {
+        if (noClickCount < noMessages.length) {
+          result.textContent = noMessages[noClickCount];
+        }
+
+        // sadece son soruda buton kacmaya baslasin
+        if (noClickCount === noMessages.length - 1) {
+          noStartedEscaping = true;
+        }
+
+        noClickCount++;
+      });
+
+    function escapeButton() {
+      if (!noStartedEscaping) return;
+      randomPosition();
+    }
+
+    noBtn.addEventListener('mouseenter', escapeButton);
+    noBtn.addEventListener('touchstart', escapeButton, { passive: true });
+
+    yesBtn.addEventListener('click', () => {
+      successScreen.classList.add('show');
+    });
+  </script>
+</body>
+</html>
