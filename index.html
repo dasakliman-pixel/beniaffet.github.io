@@ -68,6 +68,7 @@
       transition: transform .15s ease, box-shadow .15s ease, left .2s ease, top .2s ease;
       box-shadow: 0 10px 24px rgba(0,0,0,0.12);
       user-select: none;
+      -webkit-tap-highlight-color: transparent;
     }
 
     button:hover { transform: scale(1.05); }
@@ -139,11 +140,19 @@
 </head>
 <body>
   <div class="card" id="card">
-    <div style="margin-bottom:18px;"><div id="photoFallback" style="display:none;font-size:14px;color:#888;">foto bulunamadi (tuniiiis.png ayni klasorde olmali)</div><img src="tuniiiis.png" onerror="this.style.display='none';document.getElementById('photoFallback').style.display='block';" style="width:120px;height:120px;border-radius:20px;object-fit:cover;box-shadow:0 10px 30px rgba(0,0,0,0.2);"></div>
+    <div style="margin-bottom:18px;">
+      <div id="photoFallback" style="display:none;font-size:14px;color:#888;">
+        foto bulunamadi (tuniiiis.png ayni klasorde olmali)
+      </div>
+      <img
+        src="tuniiiis.png"
+        onerror="this.style.display='none';document.getElementById('photoFallback').style.display='block';"
+        style="width:120px;height:120px;border-radius:20px;object-fit:cover;box-shadow:0 10px 30px rgba(0,0,0,0.2);"
+      >
+    </div>
+
     <h1>bini iffedermisin</h1>
-    <p>
-      ruzgosbabis ozur dilemektedr tunis hannim iffidecekmisiniss?😿
-    </p>
+    <p>ruzgosbabis ozur dilemektedr tunis hannim iffidecekmisiniss?😿</p>
 
     <div class="buttons" id="buttonArea">
       <button id="yesBtn">iviiiit 😽</button>
@@ -171,45 +180,56 @@
     let noClickCount = 0;
     let noStartedEscaping = false;
 
-    function randomPosition() {
-      const areaRect = area.getBoundingClientRect();
-      const btnRect = noBtn.getBoundingClientRect();
-      const maxLeft = Math.max(10, areaRect.width - btnRect.width - 10);
-      const maxTop = Math.max(10, areaRect.height - btnRect.height - 10);
-      const left = Math.floor(Math.random() * maxLeft);
-      const top = Math.floor(Math.random() * maxTop);
-      noBtn.style.left = left + 'px';
-      noBtn.style.top = top + 'px';
+    function randomPositionFixed() {
+      const btnWidth = noBtn.offsetWidth;
+      const btnHeight = noBtn.offsetHeight;
+
+      const margin = 10;
+      const maxX = Math.max(margin, window.innerWidth - btnWidth - margin);
+      const maxY = Math.max(margin, window.innerHeight - btnHeight - margin);
+
+      const randX = Math.floor(Math.random() * (maxX - margin + 1)) + margin;
+      const randY = Math.floor(Math.random() * (maxY - margin + 1)) + margin;
+
+      noBtn.style.position = 'fixed';
+      noBtn.style.left = randX + 'px';
+      noBtn.style.top = randY + 'px';
     }
 
     const noMessages = [
-        'eminmisin 😿',
-        'bence bida dusun 😿',
-        'gercekten mi ua 😿',
-        'son kez soruyom 😿',
-        'bence ivite basmak istedin 😸'
-      ];
+      'eminmisin 😿',
+      'bence bida dusun 😿',
+      'gercekten mi ua 😿',
+      'son kez soruyom 😿',
+      'bence ivite basmak istedin 😸'
+    ];
 
-      noBtn.addEventListener('click', () => {
-        if (noClickCount < noMessages.length) {
-          result.textContent = noMessages[noClickCount];
-        }
+    noBtn.addEventListener('click', (e) => {
+      if (noStartedEscaping) {
+        e.preventDefault();
+        e.stopPropagation();
+        randomPositionFixed();
+        return;
+      }
 
-        // sadece son soruda buton kacmaya baslasin
-        if (noClickCount === noMessages.length - 1) {
-          noStartedEscaping = true;
-        }
+      if (noClickCount < noMessages.length) {
+        result.textContent = noMessages[noClickCount];
+      }
 
-        noClickCount++;
-      });
+      if (noClickCount === noMessages.length - 1) {
+        noStartedEscaping = true;
+        randomPositionFixed();
+      }
 
-    function escapeButton() {
+      noClickCount++;
+    });
+
+    noBtn.addEventListener('touchstart', (e) => {
       if (!noStartedEscaping) return;
-      randomPosition();
-    }
-
-    noBtn.addEventListener('mouseenter', escapeButton);
-    noBtn.addEventListener('touchstart', escapeButton, { passive: true });
+      e.preventDefault();
+      e.stopPropagation();
+      randomPositionFixed();
+    }, { passive: false });
 
     yesBtn.addEventListener('click', () => {
       successScreen.classList.add('show');
